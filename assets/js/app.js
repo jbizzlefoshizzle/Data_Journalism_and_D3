@@ -5,7 +5,7 @@ var svgHeight = 500;
 var margin = {
   top: 20,
   right: 40,
-  bottom: 80,
+  bottom: 60,
   left: 100
 };
 
@@ -44,18 +44,20 @@ var chartGroup = svg.append("g")
 // COMING SOON!
 
 // Retrieve csv data and EXECUTE!
-d3.csv("assets/data/data.csv").then(function(healthData) {
+d3.csv("assets/data/data.csv")
+    .then(function(healthData) {
+    // parse through data
     healthData.forEach(function(data) {
         id = +data.id;
         state = data.state;
         abbr = data.abbr;
-        poverty = parseFloat(data.poverty);
-        povertyMoe = parseFloat(data.povertyMoe);
+        data.poverty = +data.poverty;
+        data.povertyMoe = +data.povertyMoe;
         age = +data.age;
         ageMoe = +data.ageMoe;
         income = +data.income;
         incomeMoe = +data.incomeMoe;
-        healthcare = data.healthcare;
+        data.healthcare = +data.healthcare;
         healthcareLow = data.healthcareLow;
         healthcareHigh = data.healthcareHigh;
         obesity = data.obesity;
@@ -65,18 +67,22 @@ d3.csv("assets/data/data.csv").then(function(healthData) {
         smokesLow = data.smokesLow;
         smokesHigh = data.smokesHigh;
 
-        // console.log(obesity, poverty)
+        console.log(data.poverty)
         
-    })
+    });
     
     // x-scale is linear
     // var xLinearScale = xScale(healthData, initialAxis);
     var xLinearScale = d3.scaleLinear()
-        .domain(0, d3.max(healthData, d => d.poverty))
+        .domain([d3.min(healthData, d => d.poverty)-1, 
+            d3.max(healthData, d => d.poverty)+2])
+        // .domain([8, 24])
         .range([0, width]);
+    
     // y-scale is also linear
     var yLinearScale = d3.scaleLinear()
-        .domain(0, d3.max(healthData, d => d.healthcare))
+        .domain([d3.min(healthData, d => d.healthcare)-1, 
+            d3.max(healthData, d => d.healthcare)+2])
         .range([height, 0]); //must be backwards
     // Initial axes
     var bottomAxis = d3.axisBottom(xLinearScale);
@@ -93,7 +99,18 @@ d3.csv("assets/data/data.csv").then(function(healthData) {
     // Append y-axis
     chartGroup.append("g")
         .call(leftAxis);
+
     // Append initial markers
+    var circlesGroup = chartGroup.selectAll("circle")
+    .data(healthData)
+    .enter()
+    .append("circle")
+    .attr("cx", d => xLinearScale(d.poverty))
+    .attr("cy", d => yLinearScale(d.healthcare))
+    // .text(d => d.state)      DOES NOT APPEND STATE
+    .attr("r", "15")
+    .attr("fill", "pink")
+    .attr("opacity", ".5");
     // var markers = chartGroup.selectAll("circle")
     //     .data(healthData)
     //     .enter()
@@ -114,8 +131,14 @@ d3.csv("assets/data/data.csv").then(function(healthData) {
     chartGroup.append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0 - margin.left + 40)
-      .attr("x", 0 - height/2)
+      .attr("x", 0 - height/1.5)
       .attr("dy", "1em")
       .attr("class", "axisText")
       .text("Lacks Healthcare (%)");
+    
+    chartGroup.append("text")
+      .attr("transform",
+        `translate(${width / 2}, ${height + margin.top + 30})`)
+      .attr("class", "axisText")
+      .text("In Poverty (%)");
 });
