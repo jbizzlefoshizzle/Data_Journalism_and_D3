@@ -111,16 +111,7 @@ d3.csv("assets/data/data.csv")
     .attr("r", "15")
     .attr("fill", "pink")
     .attr("opacity", ".5");
-    // var markers = chartGroup.selectAll("circle")
-    //     .data(healthData)
-    //     .enter()
-    //     .append("circle")
-    //     // .attr("cx", d => xLinearScale(d[initialAxis]))
-    //     .attr("cx", d => xLinearScale(d.poverty))
-    //     .attr("cy", d => yLinearScale(d.healthcare))
-    //     .attr("r", 10) // radius
-    //     .attr("fill", "red")
-    //     .attr("opacity", ".5");
+    
     // Initialize tool tip
     // var toolTip = d3.tip()
     //     .attr("class", "tooltip")
