@@ -65,26 +65,24 @@ d3.csv("assets/data/data.csv").then(function(healthData) {
         smokesLow = data.smokesLow;
         smokesHigh = data.smokesHigh;
 
-        console.log(obesity, poverty)
+        // console.log(obesity, poverty)
         
     })
-    });
+    
     // x-scale is linear
     // var xLinearScale = xScale(healthData, initialAxis);
-        var xLinearScale = d3.scaleLinear()
-        .domain([d3.min(healthData, d => d.poverty),
-            d3.max(healthData, d => d.poverty)])
+    var xLinearScale = d3.scaleLinear()
+        .domain(0, d3.max(healthData, d => d.poverty))
         .range([0, width]);
     // y-scale is also linear
-        var yLinearScale = d3.scaleLinear()
-        .domain([d3.min(healthData, d => d.healthcare),
-            d3.max(healthData, d => d.healthcare)])
+    var yLinearScale = d3.scaleLinear()
+        .domain(0, d3.max(healthData, d => d.healthcare))
         .range([height, 0]); //must be backwards
     // Initial axes
-        var bottomAxis = d3.axisBottom(xLinearScale);
-        var leftAxis = d3.axisLeft(yLinearScale);
+    var bottomAxis = d3.axisBottom(xLinearScale);
+    var leftAxis = d3.axisLeft(yLinearScale);
     // Append x-axis
-        chartGroup.append("g")
+    chartGroup.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(bottomAxis);
     // var xAxis = chartGroup.append("g")
@@ -93,19 +91,19 @@ d3.csv("assets/data/data.csv").then(function(healthData) {
     //     .call(bottomAxis);
 
     // Append y-axis
-        chartGroup.append("g")
+    chartGroup.append("g")
         .call(leftAxis);
     // Append initial markers
-        var markers = chartGroup.selectAll("circle")
-        .data(healthData)
-        .enter()
-        .append("circle")
-        // .attr("cx", d => xLinearScale(d[initialAxis]))
-        .attr("cx", d => xLinearScale(d.poverty))
-        .attr("cy", d => yLinearScale(d.healthcare))
-        .attr("r", 10) // radius
-        .attr("fill", "red")
-        .attr("opacity", ".5");
+    // var markers = chartGroup.selectAll("circle")
+    //     .data(healthData)
+    //     .enter()
+    //     .append("circle")
+    //     // .attr("cx", d => xLinearScale(d[initialAxis]))
+    //     .attr("cx", d => xLinearScale(d.poverty))
+    //     .attr("cy", d => yLinearScale(d.healthcare))
+    //     .attr("r", 10) // radius
+    //     .attr("fill", "red")
+    //     .attr("opacity", ".5");
     // Initialize tool tip
     // var toolTip = d3.tip()
     //     .attr("class", "tooltip")
@@ -113,4 +111,11 @@ d3.csv("assets/data/data.csv").then(function(healthData) {
     //     .html(function(d) {
     //         return (`${d.}`)
     //     })
-;
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left + 40)
+      .attr("x", 0 - height/2)
+      .attr("dy", "1em")
+      .attr("class", "axisText")
+      .text("Lacks Healthcare (%)");
+});
