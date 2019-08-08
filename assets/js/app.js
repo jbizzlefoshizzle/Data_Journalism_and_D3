@@ -49,9 +49,17 @@ function renderAxes(newXscale, xAxis) {
 function renderCircles(circlesGroup, newXscale, chosenXAxis) {
     circlesGroup.transition()
         .duration(500)
-        .attr("x", d => newXscale(d[chosenXAxis]));
+        .attr("cx", d => newXscale(d[chosenXAxis]));
 
     return circlesGroup;
+};
+// Function to update text with transition to new ones
+function renderText(textGroup, newXscale, chosenXAxis) {
+    textGroup.transition()
+        .duration(500)
+        .attr("x", d => newXscale(d[chosenXAxis]));
+
+    return textGroup;
 };
 // Function with tooltip
 function updateToolTip(chosenXAxis, circlesGroup) {
@@ -60,7 +68,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
     } else if (chosenXAxis === "age") {
         var label = "years old";
     } else {
-        var label = "$income"
+        var label = "$income";
     };
 
 // Initialize tool tip
@@ -76,7 +84,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
     // But nobody's listening!
     // When clicking, show things
     circlesGroup.on("click", function(data) {
-        toolTip.show(data, this);
+        toolTip.show(data);
     })
     // When mousing away, hide things
         .on("mouseout", function(data, index) {
@@ -145,10 +153,13 @@ d3.csv("assets/data/data.csv")
     .attr("stroke", "#e3e3e3")
     .attr("opacity", ".5")
 
-    var textGroup = chartGroup.selectAll("text")
+    var textGroup = chartGroup.append("g") //NEED THIS FOR ALL TEXT TO SHOW!
+    .selectAll("text")
     .data(healthData)
     .enter()
     .append("text")
+    .attr("cx", d => xLinearScale(d[chosenXAxis]))
+    .attr("cy", d => yLinearScale(d.healthcare))
     .attr("x", d => xLinearScale(d[chosenXAxis]))
     .attr("y", d => yLinearScale(d.healthcare))
     .attr("text-anchor", "middle")
@@ -184,5 +195,71 @@ d3.csv("assets/data/data.csv")
         .attr("value", "poverty")
         .classed("active", true)
         .text("In Poverty (%)");
+    
+    var ageLabel = xLabelsAll.append("text")
+        .attr("x", 0)
+        .attr("y", 20)
+        .attr("value", "age")
+        .classed("active", true)
+        .text("Age (Median)");
 
+    var incomeLabel = xLabelsAll.append("text")
+        .attr("x", 0)
+        .attr("y", 40)
+        .attr("value", "income")
+        .classed("active", true)
+        .text("Household Income (Median)");
+    
+    var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+
+    xLabelsAll.selectAll("text")
+    .on("click", function() {
+        // What values do we want?
+        var value = d3.select(this).attr("value");
+        if (value !== chosenXAxis) {
+            // replace chosenXAxis with value
+            chosenXAxis = value;
+            // update x scale for new data
+            xLinearScale = xScale(healthData, chosenXAxis);
+            // update x axis with transition
+            xAxis = renderAxes(xLinearScale, xAxis);
+            // update circles with new x-values
+            circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+            textGroup = renderText(textGroup, xLinearScale, chosenXAxis)
+            // update tooltip
+            circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+            // change class types to clicked type
+            if (chosenXAxis === "poverty") {
+                povertyLabel
+                    .classed("active", true)
+                    .classed("inactive", false);
+                ageLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                incomeLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+            } else if (chosenXAxis === "age") {
+                povertyLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                ageLabel
+                    .classed("active", true)
+                    .classed("inactive", false);
+                incomeLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+            } else {
+                povertyLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                ageLabel
+                    .classed("active", false)
+                    .classed("inactive", true);
+                incomeLabel
+                    .classed("active", true)
+                    .classed("inactive", false);
+            }
+        }
+    }); //end xLabelsAll function
 });
