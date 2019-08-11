@@ -24,23 +24,23 @@
 }
 
 /* font size dependent on radius, see app.js */
-.stateText {
+.stateText { /* USED */
   font-family: sans-serif;
   fill: #fff;
   text-anchor: middle;
 }
 
-.stateCircle {
+.stateCircle { /* USED */
   fill: #89bdd3;
   stroke: #e3e3e3;
 }
 
-.chart {
+.chart { /* USED */
   display: block;
   margin: 0;
 }
 
-.d3-tip {
+.d3-tip { /* USED */
   padding: 6px;
   font-size: 12px;
   line-height: 2;
