@@ -69,10 +69,10 @@ function renderText(textGroup, newXScale, chosenXaxis) {
 function updateToolTip(chosenXAxis, circlesGroup) {
 
     if (chosenXAxis === "poverty") {
-      var label = "Poverty: ";
+      var label = "Poverty (%): ";
     }
     else { //label for age
-      var label = "Age: ";
+      var label = "Median Age: ";
     }; //end if-statement
 
     // Initialize tool tip
@@ -80,7 +80,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
         .attr("class", "d3-tip")
         // .offset([80, -60])
         .html(function(d) {
-            return (`${d.state}<hr>${label}${d[chosenXAxis]}%
+            return (`${d.state}<hr>${label}${d[chosenXAxis]}
                     <br>${d.healthcare}% lack healthcare`)
         }); // end toolTip
     
