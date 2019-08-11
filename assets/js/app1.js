@@ -20,7 +20,8 @@ var svg = d3.select("#scatter")
 // Append svg group
 // Translate to proper area
 var chartGroup = svg.append("g")
-  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+  .attr("transform", `translate(${margin.left}, ${margin.top})`)
+  .attr("class", "chart");
 
 // Initial parameter stuff
 // var initialAxis = "poverty"; //directly from csv keys
@@ -65,10 +66,7 @@ d3.csv("assets/data/data.csv")
         obesityHigh = data.obesityHigh;
         smokes = data.smokes;
         smokesLow = data.smokesLow;
-        smokesHigh = data.smokesHigh;
-
-        console.log(data.poverty)
-        
+        smokesHigh = data.smokesHigh;        
     });
     
     // x-scale is linear
@@ -108,7 +106,6 @@ d3.csv("assets/data/data.csv")
     .attr("class", "stateCircle")
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.healthcare))
-    // .text(d => d.state)      DOES NOT APPEND STATE
     .attr("r", "15")
     .attr("opacity", ".5");
 
@@ -125,20 +122,30 @@ d3.csv("assets/data/data.csv")
     // .attr("y", d => yLinearScale(d[chosenYAxis]))
     .attr("x", d => xLinearScale(d.poverty))
     .attr("y", d => yLinearScale(d.healthcare))
-    .attr("text-anchor", "middle")
-    .attr("font-family", "sans-serif")
+    .attr("class", "stateText")
     .attr("alignment-baseline", "middle")
     .style("font-size", "10px")
-    .attr("fill", "#fff")
     .text(d => d.abbr);
     
     // Initialize tool tip
-    // var toolTip = d3.tip()
-    //     .attr("class", "tooltip")
-    //     .offset([80, -60])
-    //     .html(function(d) {
-    //         return (`${d.}`)
-    //     })
+    var toolTip = d3.tip()
+        .attr("class", "d3-tip")
+        // .offset([80, -60])
+        .html(function(d) {
+            return (`${d.state}<hr>${d.poverty}% in poverty
+                    <br>${d.healthcare}% lack healthcare`)
+        }); // end toolTip
+    // Bring tooltip into chart
+    chartGroup.call(toolTip);
+    // Start event listeners
+    circlesGroup.on("mouseover", function(data) {
+        toolTip.show(data, this);
+    })
+        .on("mouseout", function(data, index) {
+            toolTip.hide(data);
+        }); //end event listeners
+    
+    // Labels on axes
     chartGroup.append("g")
       .attr("transform", "rotate(-90)")
       .append("text")
@@ -152,5 +159,5 @@ d3.csv("assets/data/data.csv")
       .attr("transform",
         `translate(${width / 2}, ${height + margin.top + 30})`)
       .attr("class", "axisText")
-      .text("In Poverty (%)");
+      .text("In Poverty (%)"); //end labels
 });
